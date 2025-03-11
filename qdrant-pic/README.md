@@ -28,6 +28,8 @@ pipenv --python 3.12
 pipenv install 
 ```
 
+到 `https://qdrant.tech/` 上註冊一個帳號，用 free tier 建立一個 collection 和 API KEY
+
 建立 `.env` 然後輸入 Qdrant cloud 上面建立的 API key 和 collection URL
 
 ```text
