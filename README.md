@@ -6,6 +6,8 @@
 
 [**basic-rag**](https://github.com/wm4n/langchain-llm-app-sample/tree/main/basic-rag) 展示如何使用 LangChain 開發一個基本的 LLM RAG 應用程式
 
+[**qdrant-pic**](https://github.com/wm4n/langchain-llm-app-sample/tree/main/qdrant-pic) 展示如何使用 Qdrant 和 CLIP 當作 vector store 的應用
+
 ## 測試用檔案
 
 [pdf/tw-wiki.pdf](https://github.com/wm4n/langchain-llm-app-sample/blob/main/pdf/tw-wiki.pdf) Wiki 上的 Taiwan 項目內容
