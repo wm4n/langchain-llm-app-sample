@@ -3,6 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores  import Chroma
 from langchain_openai import OpenAI
+from langchain.chat_models import init_chat_model
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
@@ -30,11 +31,9 @@ user_input = "列出台灣前五大城市和他們的人口數，依照人數排
 
 # 6. 用輸入搜尋相似度高的區塊
 relevant_docs = vector_db.similarity_search(user_input, k=3)
-docNo = 1
 for doc in relevant_docs:
-    print("\n================= Document ", docNo , " =================")
+    print("\n================= Document =================")
     print(doc.page_content)
-    docNo += 1
 
 # 7. 將搜尋結果與問題組成 LLM 格式
 prompt_template = PromptTemplate(
@@ -49,7 +48,6 @@ llm_chain = prompt_template | llm | StrOutputParser()
 
 # 組合內容
 context = "\n".join([doc.page_content for doc in relevant_docs])
-
 response = llm_chain.invoke({"context": context, "question": user_input})
 
 print("\n\n================= Response =================")

@@ -4,16 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+qdrant-client = "*"
 langchain = "*"
-openai = "*"
-faiss-cpu = "*"
 transformers = "*"
-chromadb = "*"
-"pdfminer.six" = "*"
+torch = "*"
+pillow = "*"
 python-dotenv = "*"
-langchain-community = "*"
-pypdf = "*"
-langchain-openai = "*"
 
 [dev-packages]
 
