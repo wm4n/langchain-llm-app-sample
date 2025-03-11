@@ -1,6 +1,6 @@
 ## 基礎 RAG 應用
 
-**basic-rag** 此範例程式碼展示如何使用 LangChain 開發一個基本的 LLM 應用程式，包括：
+**basic-rag** 此範例程式碼展示如何使用 LangChain 開發一個基本的 LLM RAG 應用程式，包括：
 
 - 讀取 PDF 文件
 - 切分文本為區塊
