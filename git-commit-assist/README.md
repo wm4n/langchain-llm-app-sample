@@ -1,4 +1,4 @@
-## LCEL 用法
+## Prompt Template 用法
 
 **git-commit-assist** 此範例程式碼展示如何使用 LangChain Prompt Template
 
