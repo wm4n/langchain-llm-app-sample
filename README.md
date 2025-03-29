@@ -6,6 +6,8 @@
 
 [**basic-rag**](https://github.com/wm4n/langchain-llm-app-sample/tree/main/basic-rag) 展示如何使用 LangChain 開發一個基本的 LLM RAG 應用程式
 
+[**git-commit-assist**](https://github.com/wm4n/langchain-llm-app-sample/tree/main/git-commit-assist) 展示如何使用 prompt template
+
 [**qdrant-pic**](https://github.com/wm4n/langchain-llm-app-sample/tree/main/qdrant-pic) 展示如何使用 Qdrant 和 CLIP 當作 vector store 的應用
 
 ## 測試用檔案
