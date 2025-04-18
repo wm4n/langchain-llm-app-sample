@@ -1,4 +1,4 @@
-## LCEL 用法
+## Prompt Template 用法
 
 **git-commit-assist** 此範例程式碼展示如何使用 LangChain Prompt Template
 
@@ -33,5 +33,5 @@ OPENAI_API_KEY=[YOUR OPENAI token]
 透過 pipenv 執行
 
 ```sh
-pipenv run python git.py
+pipenv run python git.py {diff file path}
 ```
