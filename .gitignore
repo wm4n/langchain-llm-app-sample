@@ -148,3 +148,4 @@ cython_debug/
 .pypirc
 
 diff.txt
+.DS_Store
