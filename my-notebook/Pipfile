@@ -12,6 +12,7 @@ python-dotenv = "*"
 pypdf = "*"
 langchain-chroma = "*"
 beautifulsoup4 = "*"
+langfuse = "*"
 
 [dev-packages]
 

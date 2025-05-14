@@ -4,24 +4,45 @@ from langchain.prompts import PromptTemplate
 from langchain.schema.runnable import RunnableSequence, RunnablePassthrough, RunnableLambda
 from langchain.schema.messages import HumanMessage, AIMessage
 from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain.memory import ConversationSummaryMemory
 from src.document_processor import DocumentProcessor
 from src.conversation_manager import ConversationManager
 import os
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from langfuse.callback import CallbackHandler
+
+langfuse_handler = CallbackHandler(
+    public_key=os.getenv("LANGFUSE_API_PUBLIC_KEY"),
+    secret_key=os.getenv("LANGFUSE_API_SECRET"),
+    host=os.getenv("LANGFUSE_URL")
+)
 
 class QAEngine:
     def __init__(self):
         self.document_processor = DocumentProcessor()
         self.conversation_manager = ConversationManager()
-        self.llm = ChatOpenAI(temperature=0)
-        self.message_history = ChatMessageHistory()
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        self.message_history = self._load_historical_conversations()
         
+        # 初始化對話摘要記憶
+        self.memory = ConversationSummaryMemory.from_messages(
+            llm=self.llm,
+            chat_memory=self.message_history,
+            memory_key="chat_history",
+            return_messages=True,
+            output_key="answer"
+        )
+
         # 定義提示模板
         self.qa_template = """使用提供的上下文來回答問題。請仔細閱讀上下文，並盡可能使用上下文中的信息來回答問題。
 
         上下文: {context}
         
-        對話歷史: {chat_history}
+        對話摘要: {chat_history}
         
         問題: {question}
         
@@ -43,11 +64,31 @@ class QAEngine:
             retriever=self.document_processor.vector_store.as_retriever(
                 search_kwargs={"k": 3}  # 檢索3個最相關的文件片段
             ),
-            memory=None,  # 不使用內置記憶
+            memory=self.memory,  # 使用摘要記憶
+            chain_type="stuff",
             return_source_documents=True,
             combine_docs_chain_kwargs={"prompt": self.qa_prompt},
             verbose=False  # 關閉詳細輸出
         )
+
+    def _load_historical_conversations(self):
+        """從 ConversationManager 載入歷史對話到 ChatMessageHistory"""
+        try:
+            message_history = ChatMessageHistory()
+
+            # 獲取最近的對話（可以設定一個合理的限制，例如最近 10 條）
+            conversations = self.conversation_manager.get_recent_conversations(limit=10)
+            
+            # 將對話載入到 ChatMessageHistory
+            for question, answer in conversations:
+                message_history.add_user_message(question)
+                message_history.add_ai_message(answer)
+            
+            return message_history
+            
+        except Exception as e:
+            print(f"載入歷史對話時出錯：{str(e)}")
+
 
     def process_input(self, input_source):
         """處理輸入源（PDF 或 URL）"""
@@ -76,7 +117,7 @@ class QAEngine:
             docs = self.document_processor.vector_store.similarity_search(question, k=3)
             
             # 印出調試信息
-            debug_info = "\n\n=== 調試信息 ===\n"
+            debug_info = "=== 調試信息 ===\n"
             debug_info += f"檢索到的文檔數量: {len(docs)}\n\n"
             
             # 顯示 Stuff 前的文檔內容
@@ -93,9 +134,11 @@ class QAEngine:
             
             # 使用 QA 鏈處理問題
             result = self.qa_chain.invoke({
-                "question": question,
-                "chat_history": conversation_history
+                "question": question
             })
+            #}, config={"callbacks": [langfuse_handler]})
+
+            # print("QA Chain 輸出:", result)
             
             # 顯示 Stuff 後的完整上下文
             debug_info += "=== Stuff 後的完整上下文 ===\n"
@@ -106,17 +149,25 @@ class QAEngine:
             
             # 構建完整的回答，先顯示參考資料
             source_info = "=== 參考資料 ===\n" + "\n".join(f"- {doc.metadata.get('source', 'Unknown')}" for doc in result.get("source_documents", []))
+            
+            # 獲取對話總結
+            conversation_summary = "=== 對話總結 ===\n"
+            if "chat_history" in result:
+                # 正確訪問消息的內容
+                chat_history_str = "\n".join(msg.content for msg in result["chat_history"])
+                conversation_summary += chat_history_str
+            
             answer = result["answer"]
             
             # 組合最終輸出
-            final_output = f"{source_info}\n{debug_info}\n\n=== 回答 ===\n{answer}"
+            final_output = f"{source_info}\n\n{conversation_summary}\n\n{debug_info}\n\n=== 回答 ===\n{answer}"
             
             # 保存對話
-            self.conversation_manager.add_conversation(question, final_output)
+            self.conversation_manager.add_conversation(question, answer)
             
             # 更新消息歷史
             self.message_history.add_user_message(question)
-            self.message_history.add_ai_message(final_output)
+            self.message_history.add_ai_message(answer)
             
             return final_output
             
