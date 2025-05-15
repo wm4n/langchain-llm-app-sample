@@ -27,7 +27,7 @@ class QAEngine:
         self.conversation_manager = ConversationManager()
         self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         self.message_history = self._load_historical_conversations()
-        
+
         # 初始化對話摘要記憶
         self.memory = ConversationSummaryMemory.from_messages(
             llm=self.llm,
@@ -105,15 +105,7 @@ class QAEngine:
     def answer_question(self, question: str) -> str:
         """回答用戶問題"""
         try:
-            # 獲取對話歷史並轉換為正確的格式
-            conversation_history = []
-            for msg in self.message_history.messages:
-                if isinstance(msg, HumanMessage):
-                    conversation_history.append(("Human", msg.content))
-                elif isinstance(msg, AIMessage):
-                    conversation_history.append(("Assistant", msg.content))
-            
-            # 嘗試檢索相關文件
+            # 嘗試檢索相關文件，下面這段主要是為了印出debug訊息，實際上 similarity_search 會在 ConversationalRetrievalChain 中執行
             docs = self.document_processor.vector_store.similarity_search(question, k=3)
             
             # 印出調試信息
@@ -134,9 +126,10 @@ class QAEngine:
             
             # 使用 QA 鏈處理問題
             result = self.qa_chain.invoke({
-                "question": question
-            })
-            #}, config={"callbacks": [langfuse_handler]})
+                "question": question}
+            )
+                # 如果有安裝 langfuse，可以取消下行的註解
+                #, config={"callbacks": [langfuse_handler]})
 
             # print("QA Chain 輸出:", result)
             
