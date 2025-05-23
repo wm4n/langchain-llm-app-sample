@@ -18,12 +18,12 @@ collection_name = os.getenv('COLLECTION_NAME')
 
 # 3. 重新創建集合
 # 檢查集合是否存在
-if client.collection_exists(collection_name="{collection_name}"):
-    client.delete_collection(collection_name="{collection_name}")
+if client.collection_exists(collection_name=collection_name):
+    client.delete_collection(collection_name=collection_name)
 
 # 創建新的集合
 client.create_collection(
-    collection_name="{collection_name}",
+    collection_name=collection_name,
     vectors_config=models.VectorParams(
         size=512, # CLIP 嵌入是 512 維
         distance=models.Distance.COSINE
