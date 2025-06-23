@@ -45,7 +45,8 @@ feat: 新增使用者登入功能
 prompt = PromptTemplate(input_variables=["diff"], template=template)
 
 # 建立 LLM
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = ChatOpenAI(model="gpt-4.1", 
+                 temperature=0.1)
 
 # 設定輸出解析器
 output_parser = StrOutputParser()
