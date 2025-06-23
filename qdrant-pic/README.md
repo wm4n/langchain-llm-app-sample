@@ -30,7 +30,13 @@ pipenv install
 
 到 `https://qdrant.tech/` 上註冊一個帳號，用 free tier 建立一個 collection 和 API KEY
 
-建立 `.env` 然後輸入 Qdrant cloud 上面建立的 API key 和 collection URL
+  1. 首頁，選建立 cluster<br/>
+     <img width="498" alt="Create Cluster" src="https://github.com/user-attachments/assets/7e97a1d7-4512-47d3-b282-fa8827aea7f9" />
+
+  2. 將 API Key 和 API endpoint 先寫下來
+
+
+建立 `.env` 然後輸入 Qdrant cloud 上面建立的 API key 和 API endpoint，collection name 可以自己隨意取
 
 ```text
 QDRANT_API_KEY=
